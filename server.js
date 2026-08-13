@@ -32,10 +32,6 @@ app.listen(port, () => {
   console.log(`The express app is ready on port ${port}!`);
 });
 
-// app.get("/", async (req, res) => {
-//   res.send("hello, friend!");
-// });
-
 // server.js
 
 // GET /
@@ -43,14 +39,9 @@ app.get("/", async (req, res) => {
   res.render("index.ejs");
 });
 
-// app.use("/auth", authController);
 
-// let port;
-// if (process.env.PORT) {
-//   port = process.env.PORT;
-// } else {
-//   port = 3000;
-// }
+app.get("/auth/sign-up", authController.signup);
+app.post("/auth/sign-up", authController.register);
 
 // server.js
 app.listen(5000, () => {
