@@ -56,14 +56,17 @@ const login = async (req, res) => {
   req.session.user = {
   username: userInDatabase.username,
   _id: userInDatabase._id,
-  };
+};
 
-  res.redirect('/');
+  req.session.save(() => {
+    res.redirect('/');
+  });
 };
 
 const signout = async (req, res) => {
-  req.session.destroy();
-  res.redirect('/');
+  req.session.destroy(() => {
+    res.redirect('/');
+  });
 };
 
 module.exports = {
