@@ -6,10 +6,20 @@
     <title>Home Page</title>
   </head>
   <body>
-    <h1>Welcome to the app!</h1>
 
-    <a href="/auth/sign-up">Sign up</a>
+    <p><a href="/vip-lounge">Get into the VIP Users Only lounge!</a></p>
 
-    <a href="/auth/sign-in">sign in</a>
+    <% if(user){ %>
+      <h1>Welcome to the app, <%= user.username %>!</h1>
+      <p>
+        <a href="/auth/sign-out">Log out</a>
+        <a href="/protected">PROTECTED ROUTE EXAMPLE</a>
+      </p>
+    <% }else{ %>
+      <h1>Welcome to the app!</h1>
+      <a href="/auth/sign-up">Register</a>
+      <a href="/auth/sign-in">Login</a>
+    <%}%>
+
   </body>
 </html>

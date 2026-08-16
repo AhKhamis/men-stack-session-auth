@@ -1,55 +1,75 @@
-const express = require("express");
-const bcrypt = require("bcrypt");
-const User = require("../models/user.js");
+const bcrypt = require('bcrypt');
+const User = require('../models/user');
 
-const signup = (req, res) => {
-  res.render("auth/sign-up.ejs");
+const SALT_ROUDS = 10;
+
+const signup = async (req, res) => {
+  res.render('auth/sign-up.ejs');
 };
 
 const register = async (req, res) => {
   try {
-
+    // verify if the username alrady exists
     const userInDatabase = await User.findOne({ username: req.body.username });
+    // if the user exists send error msg
     if (userInDatabase) {
-      return res.status(400).send("Invalid input");
+      return res.send('Invalid input');
     }
-
-
+    // else send error msg
     if (req.body.password !== req.body.confirmPassword) {
-      return res.status(400).send("Invalid input");
+      return res.send('Invalid input');
     }
-
-
-    const hashedPassword = bcrypt.hashSync(req.body.password, 10);
+    // Encrypt the password
+    const hashedPassword = bcrypt.hashSync(req.body.password, SALT_ROUDS);
     req.body.password = hashedPassword;
 
-    const newUser = await User.create(req.body);
-    console.log(newUser);
+    // else lets check if the password match
+    // if password matches create the new user
+    const user = await User.create(req.body);
 
-    res.redirect("/");
+    console.log(user);
+    // redirect to homepage
+    res.redirect('/');
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Something went wrong!!!");
+    console.log(err);
+    res.send('something went wrong');
   }
 };
 
-const signin = (req, res) => {
-  res.render("auth/sign-in.ejs");
+const signin = async (req, res) => {
+  res.render('auth/sign-in.ejs');
 };
 
 const login = async (req, res) => {
-    const userInDatabase = await User.findOne({ username: req.body.user});
+  const userInDatabase = await User.findOne({ username: req.body.username });
 
-    if(!userInDatabase){
-        return res.send('Invalid credinetals');
-    }
+  // only allow users that exist to login
+  if (!userInDatabase) {
+    return res.send('Invalid credentials');
+  }
 
+  // make sure the user's password matches the req.body.password
+  if (!bcrypt.compareSync(req.body.password, userInDatabase.password)) {
+    return res.send('Invalid credentials');
+  }
+
+  req.session.user = {
+  username: userInDatabase.username,
+  _id: userInDatabase._id,
+  };
+
+  res.redirect('/');
 };
 
+const signout = async (req, res) => {
+  req.session.destroy();
+  res.redirect('/');
+};
 
 module.exports = {
   signup,
   register,
   signin,
   login,
+  signout,
 };
